@@ -1,0 +1,48 @@
+﻿@model List<Category>
+<td><button onclick="addCategory()">Add Category</button></td>
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+
+    function addStudent(teacherid) {
+        var url = '@Url.Action("AddStudent","Teacher")' + "?id=" + teacherid;
+
+        $.get(url, function (data) {
+            $('#ModelContainer').html(data);
+            var form = document.getElementById("AddNewStudentForm");
+            $(form).removeData("validator")    // Added by jQuery Validation
+                .removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+            $.validator.unobtrusive.parse(form);
+            /*********************************** */
+
+            $('#ModalPopup').modal('show');
+        });
+            function submitForm2() {
+
+                //var url = $('#AddNewTeacherForm').data('url');
+                var form = $("#AddNewCategoryForm").serialize();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveAddCategory","Admin")',
+                    data: form,
+                    success: function (data) {
+                        if ($('#AddNewCategoryForm').valid()) {
+                            $('#ModalPopup').modal('hide');
+                            window.location.reload();
+                        }
+                        else {
+                            toastr.error(data.Message);
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+    </script>
+    }
+
+       

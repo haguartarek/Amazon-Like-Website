@@ -1,0 +1,65 @@
+﻿@model WebApplication2.ViewModels.ProductCategoryViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@using System.Security.Claims
+
+<link rel="stylesheet" href="~/css/Buyerstylesheet2.css" media="all" />
+<h1 id="header">The Marketplace is yours to explore!</h1>
+
+
+
+
+<br />
+<hr />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<br />
+<div class="moving-tape">
+    <p>Enjoy a 10% discount on mobile phones and home appliances!</p>
+    <p>When you spend over 10,000 units.</p>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-check">
+            <label id="headerr">You can pick your category here:</label>
+            <hr />
+        </div>
+        <div class="category-list">
+            <div class="vertical-line"></div>
+            @foreach (var category in Model.Categories)
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="@category.CategoryId" data-category="@category.CategoryId" />
+                    <label class="form-check-label" for="@category.CategoryId">@category.Name</label>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-9">
+        <input type="text" id="search" class="form-control" placeholder="Search for products..." />
+        <br />
+
+        <div id="productList">
+            @Html.Partial("_ProductListModalPartial", Model)
+        </div>
+
+        </div>
+
+                    <style>
+                        .moving-tape {
+    background-color: #f00; /* Set the background color of the tape */
+    color: #fff; /* Set the text color */
+    padding: 10px; /* Adjust the padding as needed */
+    animation: moving-tape 4s linear infinite; /* Define the animation */
+}
+
+@@keyframes moving-tape {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+                    </style>

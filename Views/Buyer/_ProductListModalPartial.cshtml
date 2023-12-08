@@ -1,0 +1,58 @@
+﻿ @model WebApplication2.ViewModels.ProductCategoryViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@using System.Security.Claims
+
+<link rel="stylesheet" href="~/css/Buyerstylesheet2.css" media="all" />
+
+    @using (Html.BeginForm("AddToCart", "Buyer", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+    @foreach (var product in Model.Products)
+    {
+      
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <img src="data:image/png;base64,@Convert.ToBase64String(product.Image)" width="200" height="200" alt="Product Image" />
+                <div class="card-body">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text">@product.Description</p>
+                        <p class="card-text"><span class="pprice">Price: </span>@product.Price EGP</p>
+                    
+                    <form method="post" action="/Buyer/AddToCart">
+                      
+                        <input type="hidden" name="productId" value="@product.ProductId" />
+                        <input type="hidden" name="buyerid" value="@User.FindFirst(ClaimTypes.NameIdentifier).Value" />
+                            @if (ViewData.ContainsKey("QuantityError") && Convert.ToInt32(ViewData["ProductId"]) == product.ProductId)
+
+                            {
+                                <p class="text-danger" style="font-weight:bolder ;position: absolute; bottom: 40px;">@ViewData["QuantityError"]</p>
+                            }
+                            <br />
+
+                        <div class="form-group">
+                            <label id="quantityLabel" for="quantity">Quantity:</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" data-val="true" data-val-required="Please enter a quantity." />
+                         
+                            <br />
+                        </div>
+                        <br />
+
+                        <div class="footer">
+                            <button type="submit" class="btn btn-primary" id="btnn">Add To Cart</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+    }
+
+<style>
+    .pprice{
+        font-weight:bold;
+        color: #7BC74D;
+    }
+</style>

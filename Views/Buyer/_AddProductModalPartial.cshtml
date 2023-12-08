@@ -1,0 +1,67 @@
+﻿@model Product
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Add New Product</h5>
+    <button type="button" onclick="cancelForm2()" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="AddNewProductForm" method="post" asp-action="SaveAddProduct" asp-controller="Admin" onsubmit="event.preventDefault()">
+    <div asp-validation-summary="All"></div>
+    <div>
+        <div class="modal-body">
+            <label asp-for="Name"></label>
+            <input class="form-control" asp-for="Name" />
+            <input type="hidden" class="form-control" asp-for="CategoryId" />
+            @Html.ValidationMessage("LoginFailed", new { @class = "text-danger" })
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <div>
+
+                <label asp-for="Quantity"></label>
+                <input class="form-control" asp-for="Quantity" />
+                <label asp-for="Price"></label>
+                <input class="form-control" asp-for="Price" />
+                <label asp-for="Description"></label>
+                <input class="form-control" asp-for="Description" />
+                <label asp-for="ExpirationDate"></label>
+                <input class="form-control" asp-for="ExpirationDate" />
+                <label asp-for="IsActive"></label>
+                <input class="form-control" asp-for="IsActive" />
+                <label asp-for="CategoryId"></label>
+                 <div>
+        <label asp-for="CategoryId"></label>
+        <select class="form-control" asp-for="CategoryId">
+            <option value="">Select Category</option>
+            @foreach (var category in ViewBag.ProductCategoryViewModel.Categories) {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+            </div>
+        </div>
+
+
+
+        <button id="AddNewProduct" type="submit" onclick="submitForm2()" class="btn prim-bg prim-btn">Add</button>
+        <button id="CancelBtn" onclick="cancelForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+
+    </div>
+</form>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+
+
+    <script>
+        function cancelForm2() {
+            $('#ModalPopup').modal('hide');
+        }
+    </script>
+}

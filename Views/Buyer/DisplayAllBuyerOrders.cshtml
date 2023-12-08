@@ -1,0 +1,66 @@
+﻿@model List<WebApplication2.ViewModels.OrdOrdItemsViewModel>
+
+@{
+    ViewData["Title"] = "Buyer Orders";
+}
+<link rel="stylesheet" href="~/css/DisplayOrdersstylesheet.css" media="all" />
+<h1 id="header">Order Archive</h1>
+<br />
+<hr />
+<br />
+
+@foreach (var viewModel in Model)
+{
+    
+        <div class="border tl"></div>
+        <div class="border tr"></div>
+        <div class="border bl"></div>
+        <div class="border br"></div>
+    <div class="order-container">
+    <h3>Order Date: @viewModel.Orders.FirstOrDefault()?.Date</h3>
+    <br />
+    <hr />
+    <br />
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var orderId = viewModel.Orders.FirstOrDefault()?.OrderId;
+                var ordervalue = viewModel.Orders.FirstOrDefault()?.Value;
+            }
+
+            @foreach (var orderItem in viewModel.GetOrderItemsByOrderId(orderId.HasValue ? orderId.Value : 0))
+            {
+                Product product = viewModel.Products.FirstOrDefault(p => p.ProductId == orderItem.ProductId);
+                OldProduct oldproduct = viewModel.OldProducts.FirstOrDefault(p => p.OldProductId == orderItem.OldProductId);
+
+                decimal totalPrice = orderItem.Quantity * oldproduct.Price;
+
+                <tr>
+                    <td>@oldproduct.Name</td>
+                    <td>@orderItem.Quantity</td>
+                    <td>@oldproduct.Description</td>
+                    <td>@oldproduct.Price EGP</td>
+                    <td>@totalPrice EGP</td>
+
+                </tr>
+            }
+                <h5> <span id="span">Order Total Value:</span> @ordervalue EGP</h5>
+            
+        </tbody>
+        </table>
+        </div>
+        <br />
+        <hr />
+    
+    
+}

@@ -1,0 +1,105 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@using System.Security.Claims
+@model WebApplication2.ViewModels.ProdCartCartpViewModel
+@{
+    ViewData["Title"] = "ViewCart";
+}
+<link rel="stylesheet" href="~/css/ViewCartstylesheet.css" media="all" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<h1 id="header">View Cart</h1>
+<br />
+<hr />
+<br />
+<table class="table">
+    <thead id="head">
+        <tr>
+            <th>Product Name</th>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Price</th>
+            <th>Insertion Date</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var cart_product in Model.Cart_Productss)
+            {
+                // Get the product details from the products list.
+                Product product = Model.Products.FirstOrDefault(p => p.ProductId == cart_product.ProductId);
+                decimal total = @product.Price * @cart_product.Quantity;
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    
+                       
+                    <td>@cart_product.Quantity</td>
+                           
+                        
+                       
+                    <td>@product.Price EGP</td>
+                    <td>@total EGP</td>
+                    <td>@cart_product.InsertionDate</td>
+                    <td>
+                        <form method="post" action="/Buyer/DeleteProduct/@product.ProductId?cartid=@cart_product.CartId" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                            <input type="hidden" name="buyerid" value="@User.FindFirst(ClaimTypes.NameIdentifier).Value" />
+
+                            <button type="submit" class="btn btn-link">
+                                <i class="fa fa-trash-o" style="font-size:25px"></i>
+                            </button>
+                        </form>
+                    </td>
+                    <input type="hidden" name="cartid" value="@cart_product.CartId" />
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@*<h3>Total Price: @Model.Cart_Productss.Sum(cp => cp.Quantity * Model.Products.FirstOrDefault(p => p.ProductId == cp.ProductId)?.Price) EGP</span></h3>
+*@
+@*<h3>Total Price after Discount: <span class="price"> @Model.CartValue EGP </span></h3>*@
+@if (Model.Cart_Productss.Sum(cp => cp.Quantity * Model.Products.FirstOrDefault(p => p.ProductId == cp.ProductId)?.Price) != Model.CartValue)
+{
+    <h3>
+        <span class="original-price">Total Price: @Model.Cart_Productss.Sum(cp => cp.Quantity * Model.Products.FirstOrDefault(p => p.ProductId == cp.ProductId)?.Price) EGP</span>
+    </h3>
+    <h3>
+        <span class="discounted-price"> <span class="price"> Total Price after Discount: </span>@Model.CartValue EGP</span>
+    </h3>
+    
+}
+else
+{
+    <h3> <span class="price">Total Price:</span> @Model.Cart_Productss.Sum(cp => cp.Quantity * Model.Products.FirstOrDefault(p => p.ProductId == cp.ProductId)?.Price) EGP</h3>
+}
+@if (Model.Cart_Productss.Sum(cp => cp.Quantity * Model.Products.FirstOrDefault(p => p.ProductId == cp.ProductId)?.Price) != 0)
+{
+    <form method="post" action="/Buyer/Checkout">
+        <input type="hidden" name="cartid" value="@Model.Cartid" />
+        <button type="submit" class="button-1" role="button">Purchase</button>
+    </form>
+}
+
+<script>
+    function updateQuantity(btn) {
+        var input = btn.parentNode.parentNode.querySelector("input[name='quantity']");
+        var value = parseInt(input.value);
+        var type = btn.getAttribute("data-type");
+
+        if (type === "minus") {
+            value = value - 1;
+        } else if (type === "plus") {
+            value = value + 1;
+        }
+
+        // Update the input value
+        input.value = value;
+
+        // Submit the form to update the quantity
+        var form = btn.parentNode.parentNode.parentNode;
+        form.submit();
+    }
+</script>

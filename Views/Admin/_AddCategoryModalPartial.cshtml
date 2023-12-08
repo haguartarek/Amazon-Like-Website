@@ -1,0 +1,52 @@
+﻿@model Category
+
+<link rel="stylesheet" href="~/css/AddCatPartstylesheet.css" media="all" />
+<div class="modal-header">
+    <h5 class="modal-title">Add Category</h5>
+    <button type="button" onclick="cancelForm2()" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="AddNewCategoryForm" method="post" asp-action="SaveAddCategory" asp-controller="Admin" onsubmit="event.preventDefault()">
+    <div asp-validation-summary="All"></div>
+    <div>
+        <div class="modal-body">
+            <label asp-for="Name"></label>
+            <input class="form-control" asp-for="Name" />
+            <input type="hidden" class="form-control" asp-for="CategoryId" />
+            @Html.ValidationMessage("LoginFailed", new { @class = "text-danger" })
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <div>
+                <input type="hidden" class="form-control" asp-for="InsertionDate" value="@DateTime.Now" />
+                <input type="hidden" class="form-control" asp-for="ModifiedDate" value="@DateTime.Now" />
+                
+
+
+
+            </div>
+        </div>
+
+
+        @*<input type="submit" role="button" value="Login" class="button-81" id="loginbtn" />*@
+        <button id="AddNewCategory" type="submit" onclick="submitForm2()"  class="button-81">Add</button>
+        @*<button id="CancelBtn" onclick="cancelForm2()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+*@
+
+    </div>
+</form>
+<script>
+    function cancelForm2() {
+        $('#ModalPopup').modal('hide');
+    }
+</script>
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+
+
+
+}

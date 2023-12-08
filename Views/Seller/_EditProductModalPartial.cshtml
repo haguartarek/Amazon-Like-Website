@@ -1,0 +1,129 @@
+﻿@model Product
+
+<link rel="stylesheet" href="~/css/AddProdPartstylesheet.css" media="all" />
+
+<div class="modal-header">
+    <h5 class="modal-title">Edit Product</h5>
+    <button type="button" onclick="cancelForm2()" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="EditProductForm" method="post" asp-action="SaveEdit" asp-controller="Seller" onsubmit="event.preventDefault()">
+    <div asp-validation-summary="All"></div>
+    <div>
+        <div class="modal-body">
+            <div class="form-column">
+            <label asp-for="Name"></label>
+            <input class="form-control" asp-for="Name" />
+            <input type="hidden" class="form-control" asp-for="CategoryId" />
+            @Html.ValidationMessage("LoginFailed", new { @class = "text-danger" })
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <br />
+            <div>
+
+                <label asp-for="Quantity"></label>
+                <input class="form-control" asp-for="Quantity" />
+                <br />
+                <label asp-for="Price"></label>
+                <input class="form-control" asp-for="Price" />
+                <br />
+                    <label asp-for="Description"></label>
+                    <textarea class="form-control" id="descrip" asp-for="Description"></textarea>
+
+                <br />
+  <br />
+                    <br />
+
+                    <label for="ExpirationDate">Expiration Date</label>
+                    <input class="form-control" type="date" id="ExpirationDate" asp-for="ExpirationDate" />
+                </div>
+                </div>
+            <div class="form-column">
+                <label asp-for="IsActive"> Active Product</label>
+                <input type="checkbox" id="toggle" class="form-control  custom-checkbox2" asp-for="IsActive" />
+
+              <br />
+              <br />
+                    <label asp-for="CategoryId">Category</label>
+                <select class="form-control" asp-for="CategoryId" onchange="updateHiddenField()">
+
+                        <option value="">Select Category</option>
+                        @foreach (var category in ViewBag.ProductCategoryViewModel.Categories)
+                        {
+                            <option value="@category.CategoryId">@category.Name</option>
+                        }
+                    </select>
+                    <input type="hidden" id="hiddenCategoryId" />
+                <br />
+                    
+        </div>
+        <div>
+
+                
+               
+        </div>
+            
+    </div>
+        <div class="modal-footer">
+            <br />
+        <button id="EditBtn" type="submit" onclick="submitForm11()" class="button-81">Edit</button>
+        
+        </div>
+        
+    </div>
+   
+</form>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
+<script>
+    function cancelForm2() {
+        $('#ModalPopup').modal('hide');
+    }
+        function updateHiddenField() {
+            var selectedCategory = document.querySelector('select[name="CategoryId"]').value;
+            document.getElementById('hiddenCategoryId').value = selectedCategory;
+        }
+    function updateHiddenField() {
+        var selectedCategory = document.querySelector('select[name="CategoryId"]').value;
+        document.getElementById('hiddenCategoryId').value = selectedCategory;
+    }
+
+</script>
+
+<style>
+
+
+    label {
+        display: inline-block;
+        vertical-align: middle;
+        width: 120px; /* Adjust the width as needed */
+    }
+
+    .modal-body {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .form-column {
+        width: 50%;
+        padding: 0 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        .modal-footer button {
+            margin-left: 10px;
+        }
+</style>

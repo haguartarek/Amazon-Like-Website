@@ -1,0 +1,230 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebApplication2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Navstylesheet.css" media="all" />
+</head>
+<body>
+    <header>
+        <nav id="nav" class="navbar navbar-expand-sm navbar-toggleable-sm  border-bottom box-shadow mb-3" style="background-color:#393E46" >
+            <div class="container-fluid" >
+                <a id="buybounty" class="navbar-brand" href="#">
+                    Buy<span class="fourth-letter">B</span>ounty
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                      
+                         @if (User.IsInRole("Buyer"))
+                        {
+                         
+          
+                            string id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                           // string id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Buyer/Index?buyerid=@id">Go to Marketplace</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="/Buyer/DisplayAllBuyerOrders?buyerId=@id">View Orders</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav flex-grow-2">
+                        @if (User.Identity.IsAuthenticated == false)
+                        {
+                            var x = 1;
+                            <li class="nav-item" >
+                                <a class="nav-link " asp-area="" asp-controller="Acccount" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item" >
+                                <a class="nav-link " asp-area="" asp-controller="Acccount" asp-action="Register">Register</a>
+                            </li>
+
+                        }
+                        else if (User.IsInRole("Buyer"))
+                        {
+                            var x = 1;
+                            string id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                           
+                            <li class="nav-item">
+                                <a class="nav-link " asp-area="" asp-controller="Acccount" asp-action="Logout">Logout</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#">Hi, @User.Identity.Name</a>
+                            </li>
+                          
+                            <li class="nav-item">
+                                <a class="fa fa-shopping-cart" href="/Buyer/ViewCart?buyerid=@id" style="font-size:24px;color:white"></a>
+
+                            </li>
+
+                        }
+                        else if (User.IsInRole("Seller"))
+                        {
+                            
+                            var x = 1;
+                            <li class="nav-item">
+                                <a class="nav-link " asp-area="" asp-controller="Acccount" asp-action="Logout">Logout</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#">Hi, @User.Identity.Name</a>
+                            </li>
+                        }
+                      
+
+                        
+
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Acccount" asp-action="Logout">Logout</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="GetActivationRequests">
+                                    Activation Requests
+                                    <span class="badge activation-badge green-dot"></span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Hi, Admin</a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+   @* <footer class="border-top footer text-muted">
+        <div id="footerr" class="container">
+            &copy; 2023 - BuyBounty - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>*@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        function getUserId() {
+
+
+            //how to get the actual cookie name
+            var userId = getCookie(".AspNetCore.Identity.Application"); // Replace "userId" with your actual cookie name
+
+            return userId;
+        }
+        function getCookie(cookieName) {
+            var name = cookieName + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var cookieArray = decodedCookie.split(';');
+            for (var i = 0; i < cookieArray.length; i++) {
+                var cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name) === 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return "";
+        }
+        
+        $(document).ready(function () {
+            var hasActivationRequest = false;
+            // Call the HasActivationRequests action using AJAX to check if there are any activation requests
+            $.ajax({
+                url: '@Url.Action("HasActivationRequests", "Admin")',
+                type: 'GET',
+                async: false,
+                success: function (result) {
+                    hasActivationRequest = result;
+                    updateActivationBadge();
+                }
+            });
+
+            function updateActivationBadge() {
+                if (hasActivationRequest) {
+                    $('.activation-badge').addClass('badge-success').text('.');
+                }
+            }
+        });
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+<style>
+
+
+    .fa-shopping-cart {
+        position: relative;
+        top: 4px;
+        color:white;
+    }
+
+    #nav {
+        background-color: #393E46;
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        color: white;
+    }
+
+        #nav a {
+            color: white;
+      
+        }
+
+    .green-dot {
+        background-color: #7BC74D;
+        height:3px;
+        width:3px;
+        top: 0;
+        right: 0;
+        color: #7BC74D;
+       
+      
+    }
+
+   
+
+
+    .navbar-brand::first-letter {
+        color: #7BC74D;
+    }
+
+    .fourth-letter {
+        color: #7BC74D;
+    }
+
+    #buybounty{
+        font-family: 'Fredericka the Great', cursive;
+        font-size: 30px;
+    }
+
+    #nav .nav-link {
+        color: white;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+</style>

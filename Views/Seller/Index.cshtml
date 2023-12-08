@@ -1,0 +1,185 @@
+﻿@model List<Product>
+
+
+<link rel="stylesheet" href="~/css/Buyerstylesheet.css" media="all" />
+<h1 id="header"> <span class="title"> <span class="first-letter">B</span>uy<span class="fourth-letter">B</span>ounty </span>Seller Spectrum Platform...</h1>
+<br />
+<hr />
+
+@{
+    ViewData["Title"] = "ViewAllCategories";
+    var selleridd = ViewBag.SellerId;
+}
+
+
+<body class='large-screen'>
+    <div class='table-wrapper'>
+        <table class='table-responsive card-list-table'>
+            <thead>
+        <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Expiration Date</th>
+            <th>Activity</th>
+            <th>Category</th>
+            <th>Image</th>
+            <th>Edit Product</th>
+             <th>Delete Product</th>
+            <th>Activate/Disactivate</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @if (Model != null)
+        {
+
+            @foreach (var item in Model)
+            {
+
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price</td>
+                    <td>@item.Description</td>
+                    <td>@item.ExpirationDate</td>
+                    <td>@item.IsActive</td>
+                    @if (ViewBag.ProductCategoryViewModel.Categories != null)
+                    {
+                        @foreach (var category in ViewBag.ProductCategoryViewModel.Categories)
+                        {
+                            @if (category.CategoryId == item.CategoryId)
+                            {
+                                <td>@category.Name</td>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <td>No Category</td>
+                    }
+                    <td>
+                        <img src="data:image/png;base64,@Convert.ToBase64String(item.Image)" width="120" height="120" alt="Product Image" />
+                    </td>
+
+                    <input type="hidden" class="form-control" asp-for="@item.CategoryId" />
+                    
+                            <td><button onclick="editProduct(@item.ProductId)" class="button-57" role="button"><span class="text"> Edit</span> <span>Product</span></button></td>
+                       <td><a href="/Seller/DeleteProduct/@item.ProductId">Delete</a></td>
+                    <td><a href="/Seller/ActdisProduct?productId=@item.ProductId">Change Activation</a></td>
+
+                </tr>
+
+            }
+        }
+    </tbody>
+        </table>
+    </div>
+</body>
+<div class="modal  " id="ModalPopup" tabindex="-1" role="dialog" aria-labelledby="partial" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="ModelContainer">
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        var currentProductId;
+        var current = '@ViewBag.SellerId';
+        function submitForm10() {
+            var form = $("#AddNewProductForm")[0]; // Get the form element
+            var formData = new FormData(form); // Create a FormData object
+
+            // Append the image file to the FormData object
+            var imageFile = $("#ImageFile")[0].files[0];
+            formData.append("ImageFile", imageFile);
+
+            // Append the CategoryId from the hidden field to the FormData object
+            var categoryId = $("#hiddenCategoryId").val();
+            formData.append("hiddenCategoryId", categoryId);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveAddNewProduct","Seller")',
+                data: formData,
+                processData: false, // Prevent jQuery from processing the data
+                contentType: false, // Prevent jQuery from setting the content type
+                success: function (data) {
+                    if ($('#AddNewProductForm').valid()) {
+                        $('#ModalPopup').modal('hide');
+                        window.location.reload();
+                    } else {
+                        toastr.error(data.Message);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        
+        }
+        function submitForm11() {
+
+
+            var form = $("#EditProductForm").serialize();
+            var categoryId = $("#hiddenCategoryId").val();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveEdit","Seller")',
+                data: form + "&id=" + currentProductId + "&hiddenCategoryId=" + categoryId,
+                success: function (data) {
+                    if ($('#EditProductForm').valid()) {
+                        $('#ModalPopup').modal('hide');
+                        window.location.reload();
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+        $('#AddBtn').click(function () {
+            var url = '@Url.Action("AddProduct","Seller")';
+            
+            $.get(url, function (data) {
+                $('#ModelContainer').html(data);
+
+                var form = document.getElementById("AddNewProductForm");
+                $(form).removeData("validator")    // Added by jQuery Validation
+                    .removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+                $.validator.unobtrusive.parse(form);
+                /*********************************** */
+
+                $('#ModalPopup').modal('show');
+            });
+        });
+        function editProduct(productid) {
+            var url = '@Url.Action("Edit","Seller")' + "?id=" + productid;
+            currentProductId = productid;
+            $.get(url, function (data) {
+                $('#ModelContainer').html(data);
+                var form = document.getElementById("EditProductForm");
+                $(form).removeData("validator")    // Added by jQuery Validation
+                    .removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+                $.validator.unobtrusive.parse(form);
+                /*********************************** */
+
+                $('#ModalPopup').modal('show');
+            });
+        }
+
+    </script>
+}
+<button id="AddBtn" role="button" type="button" class="button-1">
+    Add New Product
+</button>

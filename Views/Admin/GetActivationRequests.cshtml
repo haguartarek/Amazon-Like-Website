@@ -1,0 +1,32 @@
+﻿@model List<ActivationRequest>
+<link rel="stylesheet" href="~/css/Tablestylesheet3.css" media="all" />
+<h1 style='text-align:center'>Activation Requests</h1>
+
+<body class='large-screen'>
+    <div class='table-wrapper'>
+        <table class='table-responsive card-list-table'>
+    <thead>
+        <tr>
+            <th>Request ID</th>
+            <th>Request Date</th>
+            
+            <th>Seller ID</th>
+            <th>Seller Name</th>
+            <th>Activate</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.ActivationRequestId</td>
+                <td>@request.RequestDate</td>
+                <td>@request.SellerId</td>
+                 <td>@request.SellerName</td>
+                <td><a href="/Admin/ActdisSeller?sellerId=@request.SellerId">Activate</a></td>
+
+            </tr>
+        }
+        </table>
+    </div>
+</body>
